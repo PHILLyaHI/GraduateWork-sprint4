@@ -1,0 +1,15 @@
+{% extends "projectapp/layout.html" %}
+{% block title %}Send Email{% endblock %}
+
+{% block content %}
+<center>
+<h1>Do you Have any Questions?</h1>
+<h3>Send us Email</h3>
+<br>
+<form method="POST">
+    {% csrf_token %}<br>
+    {{ form }}<br>
+    <button class="btn btn-dark" type="submit">Send</button>
+</form>
+<center>
+{% endblock %}

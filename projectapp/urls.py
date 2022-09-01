@@ -30,4 +30,5 @@ urlpatterns = [
     path('search_videos/', views.search_videos, name="search-videos"),
     path("user/ban/<int:pk>/", BanUserView.as_view(), name="ban-user"),
     path("user_list/", UserListView.as_view(), name="user-list"),
+    path("email/", views.form, name="email")
 ]

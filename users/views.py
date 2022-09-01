@@ -1,15 +1,16 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect
 from django.views import generic
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserChangeForm
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, CreateView
-from django.core.mail import send_mail
+from django.views.generic import CreateView
 from users.forms import RegisterForm
+
 
 class UserRegisterView(generic.CreateView):
     form_class = RegisterForm
     template_name = 'registration/register.html'
     success_url = reverse_lazy('login')
+
 
 
 class UserChangeView(generic.UpdateView):

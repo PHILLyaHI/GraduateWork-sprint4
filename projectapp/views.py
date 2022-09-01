@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from projectapp.models import *
 from django.http import HttpResponseRedirect
@@ -7,8 +7,11 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from projectapp.serializers import *
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from rest_framework import status
+from django.conf import settings
+from django.contrib import messages
+from django.core.mail import send_mail
+from projectapp.forms import *
 
 
 class HomeView(ListView):
@@ -82,3 +85,18 @@ class VideoViewset(viewsets.ModelViewSet):
 class CommentViewset(viewsets.ModelViewSet):
    queryset = Comment.objects.all()
    serializer_class = CommentSerializer
+
+
+def form(request):
+    form = EmailForm()
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            subject = 'Your account was succesfully done!'
+            message = 'Now you can Became a Famous Person'
+            recipient = form.cleaned_data.get('email')
+            send_mail(subject, 
+              message, settings.EMAIL_HOST_USER, [recipient], fail_silently=False)
+            messages.success(request, 'Success!')
+            return redirect('email')
+    return render(request, 'projectapp/email.html', {'form': form})
