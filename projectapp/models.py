@@ -7,7 +7,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
     bio = models.TextField()
     profile_pic = models.ImageField(null=True, upload_to="photos/")
-    is_banned = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     birthday = models.DateField(null=True)
 
     def __str__(self):
@@ -41,9 +41,20 @@ class Comment(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name="comments")
     comment = models.TextField(null=True)
     date_added = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return '%s - %s' % (self.video.title, self.user)
 
     def get_absolute_url(self):
         return reverse('index')
+
+
+class Email(models.Model):
+    client_name=models.CharField(max_length=255)
+    lastname=models.CharField(max_length=255, null=True)
+    email=models.EmailField(null=True)
+    message=models.TextField()
+
+    def __str__(self):
+        return self.client_name

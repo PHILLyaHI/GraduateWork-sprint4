@@ -1,10 +1,5 @@
-from .models import *
+from projectapp.models import *
 from rest_framework import serializers
-
-from django.db import models
-from django.contrib.auth.models import User
-from django.urls import reverse
-from django.conf import settings
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:

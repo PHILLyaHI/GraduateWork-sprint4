@@ -3,21 +3,14 @@ from django.views.generic import ListView, DetailView, CreateView, DeleteView, U
 from projectapp.models import *
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from rest_framework import viewsets
-from rest_framework import permissions
-from projectapp.serializers import *
-from rest_framework.response import Response
-from rest_framework import status
-from django.conf import settings
-from django.contrib import messages
 from django.core.mail import send_mail
 from projectapp.forms import *
+from django.views import View
 
 
 class HomeView(ListView):
     model = Video
     template_name = "projectapp/index.html"
-    ordering = ['-id']
 
 class VideoDetailView(DetailView):
     model = Video
@@ -55,48 +48,37 @@ def search_videos(request):
         return render(request, 'projectapp/search_videos.html', {})
 
 
-class BanUserView(UpdateView):
-    model = Profile
-    template_name = "projectapp/ban_user.html"
-    fields = ["user", "is_ban"]
-
-
 class UserListView(ListView):
     model = Profile
     template_name = "projectapp/user_list.html"
 
 
-class ProfileViewset(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+class EmailView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "projectapp/email.html", {})
+
+    def post(self, request, *args, **kwargs):
+        email = Email(
+            client_name=request.POST['client_name'],
+            lastname=request.POST['lastname'],
+            email=request.POST['email'],
+            message=request.POST['message'],
+        )
+        email.save()
+
+        send_mail( 
+            subject=email.client_name,  # имя клиента и дата записи будут в теме для удобства
+            message=email.message,  # сообщение с кратким описанием проблемы
+            from_email='phillippapetenok@gmail.com', # здесь указываете почту, с которой будете отправлять (об этом попозже)
+            recipient_list=[]  # здесь список получателей. Например, секретарь, сам врач и т. д.
+        )
+
+        return redirect('index')
 
 
-class VideoViewset(viewsets.ModelViewSet):
-    queryset = Video.objects.all()
-    serializer_class = VideoSerializer
-
-    def destroy(self, request, pk, format=None):
-        instance = self.get_object()
-        instance.is_active = False
-        instance.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class VideoDeleteView(DeleteView):
+    model = Video
+    template_name = "projectapp/delete_video.html"
+    success_url = "index"
 
 
-class CommentViewset(viewsets.ModelViewSet):
-   queryset = Comment.objects.all()
-   serializer_class = CommentSerializer
-
-
-def form(request):
-    form = EmailForm()
-    if request.method == 'POST':
-        form = EmailForm(request.POST)
-        if form.is_valid():
-            subject = 'Your account was succesfully done!'
-            message = 'Now you can Became a Famous Person'
-            recipient = form.cleaned_data.get('email')
-            send_mail(subject, 
-              message, settings.EMAIL_HOST_USER, [recipient], fail_silently=False)
-            messages.success(request, 'Success!')
-            return redirect('email')
-    return render(request, 'projectapp/email.html', {'form': form})

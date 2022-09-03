@@ -9,12 +9,7 @@
     </video>
     <h3 class="mt-2 mb-2">{{video.title}}</h3>
     <h8 class="nav-link disabled">{{ video.date_added }}</h8>
-
-    {% if user.is_staff %}
-        <h5>By: {{ video.user }} <a href="{% url 'ban-user' user.pk %}" class="btn btn-danger">Ban</a></h5>
-    {% else %}
         <h5>{{ video.user }}</h5>
-    {% endif %}
     {% if user.is_authenticated %}
     <form action="{% url 'like-video' video.pk %}" method="POST">
         {% csrf_token %}
